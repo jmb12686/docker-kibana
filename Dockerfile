@@ -11,7 +11,7 @@ ARG KIBANA_VERSION=7.4.1
 
 RUN set -x \
  && apt update -qq \
- && apt install -qqy --no-install-recommends ca-certificates curl gosu wget \
+ && apt install -qqy --no-install-recommends ca-certificates curl gosu wget libkrb5-dev \
  && apt clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
