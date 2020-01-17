@@ -6,12 +6,14 @@ ARG KIBANA_VERSION=7.4.1
 #                                INSTALLATION
 ###############################################################################
 
-### install prerequisites (cURL, gosu, tzdata)
+### install prerequisites (cURL, gosu, tzdata, nodejs)
+### NodeJS version 10.15.2 is required for Kibana version 7.4.1
 
 RUN set -x \
  && apt update -qq \
  && apt install -qqy --no-install-recommends ca-certificates curl gosu tzdata wget \
  && curl -sL https://deb.nodesource.com/setup_10.x | bash \
+ && apt install -y nodejs=10.15.2 \
  && apt clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
@@ -47,7 +49,9 @@ USER ${KIBANA_UID}
 #  && chmod +x /etc/init.d/kibana
 
 #  #### NodeJS for Kibana overwrite embedded node with node version installed thru apt
-RUN which node \
+RUN node -v
+RUN set -x \
+  && which node \
   && NODE_PATH=$(which node) \
   && echo "NODE_PATH=$NODE_PATH" \
   && ln -sf $NODE_PATH /opt/kibana/node/bin/node
