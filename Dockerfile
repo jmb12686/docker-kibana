@@ -6,14 +6,12 @@ ARG KIBANA_VERSION=7.4.1
 #                                INSTALLATION
 ###############################################################################
 
-### install prerequisites (cURL, gosu, tzdata, nodejs)
-### NodeJS version 10.15.2 is required for Kibana version 7.4.1
+### install prerequisites (cURL, gosu)
+
 
 RUN set -x \
  && apt update -qq \
- && apt install -qqy --no-install-recommends ca-certificates curl gosu tzdata wget \
- && curl -sL https://deb.nodesource.com/setup_10.x | bash \
- && apt install -y nodejs=10.15.2 \
+ && apt install -qqy --no-install-recommends ca-certificates curl gosu wget \
  && apt clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
@@ -41,21 +39,19 @@ RUN mkdir ${KIBANA_HOME} \
 ###############################################################################
 
 ### Kibana
-USER ${KIBANA_UID}
-
 
 # ADD ./kibana-init /etc/init.d/kibana
 # RUN sed -i -e 's#^KIBANA_HOME=$#KIBANA_HOME='$KIBANA_HOME'#' /etc/init.d/kibana \
 #  && chmod +x /etc/init.d/kibana
 
-#  #### NodeJS for Kibana overwrite embedded node with node version installed thru apt
-RUN node -v
+### NodeJS version 10.15.2 is required for Kibana version 7.4.1.  Delete node distribution included with kibana and replace with manually installed version
 RUN set -x \
-  && which node \
-  && NODE_PATH=$(which node) \
-  && echo "NODE_PATH=$NODE_PATH" \
-  && ln -sf $NODE_PATH /opt/kibana/node/bin/node
+  && rm -rf /opt/kibana/node \
+  && curl -O https://nodejs.org/dist/v10.15.2/node-v10.15.2-linux-armv6l.tar.gz \
+  && tar -xvf node-v10.15.2-linux-armv6l.tar.gz \
+  && mv node-v10.15.2-linux-armv6l /opt/kibana/node
 
+USER ${KIBANA_UID}
 
 # RUN cd /root && curl -O https://nodejs.org/dist/v10.15.2/node-v10.15.2-linux-armv6l.tar.gz && tar -xvf node-v10.15.2-linux-armv6l.tar.gz
 # ADD ./kibana.sh /opt/kibana/bin/kibana
