@@ -35,5 +35,5 @@ docker buildx build --platform linux/arm -t jmb12686/kibana:latest --push .
 ## How to Run
 
 ```bash
-# sudo docker run --rm -e "ES_JAVA_OPTS=-Xmx256m -Xms256m" -e "discovery.type=single-node" -v /home/pi/raspi-docker-stacks/elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml jmb12686/kibana
+sudo docker run --rm -p 5601:5601 -v /home/pi/raspi-docker-stacks/elk/kibana/config/kibana.yml:/opt/kibana/config/kibana.yml jmb12686/kibana
 ```
