@@ -1,2 +1,39 @@
 # docker-kibana
+
 Multi-architecture (arm, x86) Docker image for Kibana
+
+## How to Build
+
+Build using `buildx` for multiarchitecture image and manifest support
+
+Setup buildx
+
+```bash
+docker buildx create --name multiarchbuilder
+docker buildx use multiarchbuilder
+docker buildx inspect --bootstrap
+[+] Building 0.0s (1/1) FINISHED
+ => [internal] booting buildkit                                                                                                                 5.7s 
+ => => pulling image moby/buildkit:buildx-stable-1                                                                                              4.6s 
+ => => creating container buildx_buildkit_multiarchbuilder0                                                                                     1.1s 
+Name:   multiarchbuilder
+Driver: docker-container
+
+Nodes:
+Name:      multiarchbuilder0
+Endpoint:  npipe:////./pipe/docker_engine
+Status:    running
+Platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+```
+
+Build
+
+```bash
+docker buildx build --platform linux/arm -t jmb12686/kibana:latest --push .
+```
+
+## How to Run
+
+```bash
+# sudo docker run --rm -e "ES_JAVA_OPTS=-Xmx256m -Xms256m" -e "discovery.type=single-node" -v /home/pi/raspi-docker-stacks/elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml jmb12686/kibana
+```
