@@ -91,7 +91,8 @@ RUN set -x \
 
 RUN set -x \
   && cd /nodegit \ 
-  && /opt/kibana/node/bin/npm install ctags
+  && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \  
+  && /opt/kibana/node/bin/npm install ctags --unsafe-perm
 
 RUN set -x \
   && mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-x64 /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm \

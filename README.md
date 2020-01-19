@@ -6,7 +6,13 @@ Multi-architecture (arm, x86) Docker image for Kibana
 
 1. Tweak the `apt install` blocks.  I had to break them apart while debugging hanging build.
 
-2. Break the dockerfile into multistage build
+2. Evaluate options to speed up build.  npm build of `nodegit` and `ctags` take very long, potential options include: 
+
+    * Extracting / caching the compiled `nodegit` and `ctags` download the cached binaries during build.
+
+    * Investigate if bumping Kibana to newer version would eliminate the dependencies.  See post regarding this topic https://discuss.elastic.co/t/installing-kibana-on-a-raspberry-pi-4-using-raspbian-buster/202612/7
+
+3. Break the dockerfile into multistage build
 
 ## How to Build
 
