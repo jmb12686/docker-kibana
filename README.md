@@ -49,3 +49,10 @@ docker buildx build --platform linux/arm -t jmb12686/kibana:latest --push .
 ```bash
 sudo docker run --rm -p 5601:5601 -v /home/pi/raspi-docker-stacks/elk/kibana/config/kibana.yml:/opt/kibana/config/kibana.yml jmb12686/kibana
 ```
+
+## TODO Errors
+
+When navigating to the 'Discovery' tab, receive following error in UI:
+
+`No indices match pattern "apm-*"`
+
