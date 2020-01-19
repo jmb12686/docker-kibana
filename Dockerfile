@@ -38,8 +38,8 @@ RUN set -e \
 
  RUN set -e \
  && apt clean \
- && rm -rf /var/lib/apt/lists/* \
- && gosu nobody true
+ && rm -rf /var/lib/apt/lists/*
+#  && gosu nobody true
 #  && set +x
 
  ### install Kibana
