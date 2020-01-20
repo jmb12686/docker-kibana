@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG KIBANA_VERSION=7.4.1
+ARG KIBANA_VERSION=7.5.1
 
 ###############################################################################
 #                                INSTALLATION
@@ -85,14 +85,14 @@ RUN set -x \
   && cd /nodegit \
   && wget https://github.com/fg2it/phantomjs-on-raspberry/releases/download/v2.1.1-wheezy-jessie-armv6/phantomjs \
   && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \
-  && chmod -R 777 /nodegit \
-  && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
+  && chmod -R 777 /nodegit ; fi
+  # && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
 
-RUN set -x \
-  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
-  && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
-  && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
-  && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
+# RUN set -x \
+#   && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
+#   && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
+#   && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
+#   && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
 
 RUN set -x \
   && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then cd /nodegit \ 
