@@ -1,44 +1,20 @@
 # docker-kibana
 
-Containerized, ARM version of kibana. Compatible with Raspberry Pi
+<p align="center">
+  <a href="https://hub.docker.com/r/jmb12686/kibana/tags?page=1&ordering=last_updated"><img src="https://img.shields.io/github/v/tag/jmb12686/docker-kibana?label=version&style=flat-square" alt="Latest Version"></a>
+  <a href="https://github.com/jmb12686/docker-kibana/actions"><img src="https://github.com/jmb12686/docker-kibana/workflows/build/badge.svg" alt="Build Status"></a>
+  <a href="https://hub.docker.com/r/jmb12686/kibana/"><img src="https://img.shields.io/docker/stars/jmb12686/kibana.svg?style=flat-square" alt="Docker Stars"></a>
+  <a href="https://hub.docker.com/r/jmb12686/kibana/"><img src="https://img.shields.io/docker/pulls/jmb12686/kibana.svg?style=flat-square" alt="Docker Pulls"></a>
 
-## How to Build
+Containerized, multiarch version of [Kibana](https://github.com/elastic/kibana). Designed to be usable within x86-64, armv6, and armv7 based Docker Swarm clusters. Compatible with all Raspberry Pi models (armv6 + armv7).
 
-Build using `buildx` for multiarchitecture image and manifest support
-
-Setup buildx
-
-```bash
-docker buildx create --name multiarchbuilder
-docker buildx use multiarchbuilder
-docker buildx inspect --bootstrap
-[+] Building 0.0s (1/1) FINISHED
- => [internal] booting buildkit                                                                                                                 5.7s
- => => pulling image moby/buildkit:buildx-stable-1                                                                                              4.6s
- => => creating container buildx_buildkit_multiarchbuilder0                                                                                     1.1s
-Name:   multiarchbuilder
-Driver: docker-container
-
-Nodes:
-Name:      multiarchbuilder0
-Endpoint:  npipe:////./pipe/docker_engine
-Status:    running
-Platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
-```
-
-Build
-
-```bash
-docker buildx build --platform linux/arm -t jmb12686/kibana:latest --push .
-```
-
-## How to Run
+## Usage
 
 Run on a single Docker engine node:
 
 ```bash
 sudo docker run --rm -p 5601:5601 \
-  -v /home/pi/raspi-docker-stacks/elk/kibana/config/kibana.yml:/opt/kibana/config/kibana.yml \
+  -v ${PWD}/config/example/kibana.yml:/opt/kibana/config/kibana.yml \
   jmb12686/kibana
 ```
 
@@ -91,4 +67,34 @@ This may be resolved simply by adding configuration in filebeat to setup index t
 
     * Investigate if bumping Kibana to newer version would eliminate the dependencies.  See post regarding this topic <https://discuss.elastic.co/t/installing-kibana-on-a-raspberry-pi-4-using-raspbian-buster/202612/7>
 
-3. Break the dockerfile into multistage build
+3. Break the dockerfile into multistage build, push builder stage as described here: <https://pythonspeed.com/articles/faster-multi-stage-builds/>
+
+## How to Build
+
+Build using `buildx` for multiarchitecture image and manifest support
+
+Setup buildx
+
+```bash
+docker buildx create --name multiarchbuilder
+docker buildx use multiarchbuilder
+docker buildx inspect --bootstrap
+[+] Building 0.0s (1/1) FINISHED
+ => [internal] booting buildkit                                                                                                                 5.7s
+ => => pulling image moby/buildkit:buildx-stable-1                                                                                              4.6s
+ => => creating container buildx_buildkit_multiarchbuilder0                                                                                     1.1s
+Name:   multiarchbuilder
+Driver: docker-container
+
+Nodes:
+Name:      multiarchbuilder0
+Endpoint:  npipe:////./pipe/docker_engine
+Status:    running
+Platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+```
+
+Build
+
+```bash
+docker buildx build --platform linux/arm,linux/amd64 -t jmb12686/kibana:latest --push .
+```
