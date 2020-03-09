@@ -117,11 +117,20 @@ RUN \
 	# sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch &>/tmp/eslog & \
 	# until grep -qm 1 'LicenseService.*license.*mode \[basic\] - valid' /tmp/eslog; do sleep 1; done \
 	# ) && \
+  # opt/kibana/bin/kibana
 	( \
-	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana &>/tmp/kibana & \
-	until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do sleep 1; done \
-	) && \
-	pkill -u kibana
+	set -e; \
+	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
+	line=0; \
+	until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do \
+	sleep 1; \
+	tail -qn +$((line+1)) /tmp/kibana; \
+	line=$(wc -l /tmp/kibana | cut -d' ' -f1); \
+	pgrep -u kibana >/dev/null; \
+	done \
+	); \
+	pkill -u kibana; \
+	until pgrep -u kibana >/dev/null; do sleep 1; done;
 	# pkill -u elasticsearch && \
 	# until grep -qm 1 'Node.*closed' /tmp/eslog; do sleep 1; done
 
