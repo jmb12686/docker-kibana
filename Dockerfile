@@ -118,7 +118,7 @@ RUN \
 	# until grep -qm 1 'LicenseService.*license.*mode \[basic\] - valid' /tmp/eslog; do sleep 1; done \
 	# ) && \
 	( \
-	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /usr/local/bin/kibana-docker &>/tmp/kibana & \
+	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /usr/local/bin/kibana &>/tmp/kibana & \
 	until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do sleep 1; done \
 	) && \
 	pkill -u kibana
