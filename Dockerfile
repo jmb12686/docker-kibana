@@ -126,7 +126,7 @@ RUN \
 	# sleep 1; \
 	# tail -qn +$((line+1)) /tmp/kibana; \
 	# line=$(wc -l /tmp/kibana | cut -d' ' -f1); \
-  ( tail -f -n0 /tmp/kibana & ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
+  ( tail -f -n0 /tmp/kibana ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
 	pgrep -u kibana >/dev/null; \
 	# done \
 	); \
