@@ -122,7 +122,7 @@ RUN \
 	set -e; \
 	# NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
   # ( tail -f -n0 /tmp/kibana ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
-  NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
+  NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
 	);
 	# until pgrep -u kibana >/dev/null; do sleep 1; done;
 
