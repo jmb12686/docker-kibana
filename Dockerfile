@@ -120,20 +120,13 @@ RUN \
   # opt/kibana/bin/kibana
 	( \
 	set -e; \
-	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
-	# line=0; \
-	# until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do \
-	# sleep 1; \
-	# tail -qn +$((line+1)) /tmp/kibana; \
-	# line=$(wc -l /tmp/kibana | cut -d' ' -f1); \
-  ( tail -f -n0 /tmp/kibana ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
+	# NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
+  # ( tail -f -n0 /tmp/kibana ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
+  NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
 	pgrep -u kibana >/dev/null; \
-	# done \
 	); \
-	pkill -u kibana; \
-	until pgrep -u kibana >/dev/null; do sleep 1; done;
-	# pkill -u elasticsearch && \
-	# until grep -qm 1 'Node.*closed' /tmp/eslog; do sleep 1; done
+	pkill -u kibana;
+	# until pgrep -u kibana >/dev/null; do sleep 1; done;
 
 USER ${KIBANA_UID}
 
