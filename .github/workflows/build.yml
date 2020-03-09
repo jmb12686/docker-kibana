@@ -7,7 +7,7 @@ on:
     branches: 
       - 'master'
       - 'v7.4.1'
-      - 'v7.4.1-elastalert'
+      - 'v7.4.1-elastalert*'
     tags: '*'
 
 jobs:
