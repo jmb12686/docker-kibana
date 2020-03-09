@@ -3,8 +3,8 @@ FROM ubuntu:18.04
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG KIBANA_VERSION=7.5.1
-
+ARG KIBANA_VERSION=7.4.1
+ARG ELASTALERT_VERSION=1.1.0
 ###############################################################################
 #                                INSTALLATION
 ###############################################################################
@@ -21,7 +21,9 @@ RUN set -e \
  && apt install -y --no-install-recommends wget \
  && apt install -y --no-install-recommends libkrb5-dev \
  && apt install -y --no-install-recommends git \
- && apt install -y --no-install-recommends libfontconfig
+ && apt install -y --no-install-recommends libfontconfig \
+ && apt install -y --no-install-recommends sudo \
+ && apt install -y --no-install-recommends grep
  
  RUN set -e \
  && apt install -y --no-install-recommends python \
@@ -85,14 +87,14 @@ RUN set -x \
   && cd /nodegit \
   && wget https://github.com/fg2it/phantomjs-on-raspberry/releases/download/v2.1.1-wheezy-jessie-armv6/phantomjs \
   && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \
-  && chmod -R 777 /nodegit ; fi
-  # && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
+  && chmod -R 777 /nodegit \
+  && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
 
-# RUN set -x \
-#   && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
-#   && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
-#   && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
-#   && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
+RUN set -x \
+  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
+  && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
+  && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
+  && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
 
 RUN set -x \
   && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then cd /nodegit \ 
@@ -104,6 +106,24 @@ RUN set -x \
   && mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node.old \
   && cp /nodegit/node_modules/ctags/build/Release/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm ; fi
 
+# Install elastalert plugin
+RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/${ELASTALERT_VERSION}/elastalert-kibana-plugin-${ELASTALERT_VERSION}-${KIBANA_VERSION}.zip
+
+
+## Run kibana to finalize plugin installation and optimization....
+COPY ./config/example/kibana.yml /opt/kibana/config/kibana.yml
+RUN \
+	# ( \
+	# sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch &>/tmp/eslog & \
+	# until grep -qm 1 'LicenseService.*license.*mode \[basic\] - valid' /tmp/eslog; do sleep 1; done \
+	# ) && \
+	( \
+	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /usr/local/bin/kibana-docker &>/tmp/kibana & \
+	until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do sleep 1; done \
+	) && \
+	pkill -u kibana
+	# pkill -u elasticsearch && \
+	# until grep -qm 1 'Node.*closed' /tmp/eslog; do sleep 1; done
 
 USER ${KIBANA_UID}
 
