@@ -121,13 +121,14 @@ RUN \
 	( \
 	set -e; \
 	NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
-	line=0; \
-	until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do \
-	sleep 1; \
-	tail -qn +$((line+1)) /tmp/kibana; \
-	line=$(wc -l /tmp/kibana | cut -d' ' -f1); \
+	# line=0; \
+	# until grep -qm 1 'Optimization of bundles for .* complete in .* seconds' /tmp/kibana; do \
+	# sleep 1; \
+	# tail -qn +$((line+1)) /tmp/kibana; \
+	# line=$(wc -l /tmp/kibana | cut -d' ' -f1); \
+  ( tail -f -n0 /tmp/kibana & ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
 	pgrep -u kibana >/dev/null; \
-	done \
+	# done \
 	); \
 	pkill -u kibana; \
 	until pgrep -u kibana >/dev/null; do sleep 1; done;
