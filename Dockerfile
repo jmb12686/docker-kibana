@@ -112,18 +112,19 @@ RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kiba
 
 ## Run kibana to finalize plugin installation and optimization....
 COPY ./config/example/kibana.yml /opt/kibana/config/kibana.yml
-RUN \
+RUN timeout 20m NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana
+# RUN \
 	# ( \
 	# sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch &>/tmp/eslog & \
 	# until grep -qm 1 'LicenseService.*license.*mode \[basic\] - valid' /tmp/eslog; do sleep 1; done \
 	# ) && \
   # opt/kibana/bin/kibana
-	( \
-	set -e; \
+	# ( \
+	# set -e; \
 	# NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana opt/kibana/bin/kibana &>/tmp/kibana & \
   # ( tail -f -n0 /tmp/kibana ) | grep -q "Optimization of bundles for .* complete in .* seconds"; \
-  NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
-	);
+  # NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
+	# );
 	# until pgrep -u kibana >/dev/null; do sleep 1; done;
 
 USER ${KIBANA_UID}
