@@ -112,7 +112,7 @@ RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kiba
 
 ## Run kibana to finalize plugin installation and optimization....
 COPY ./config/example/kibana.yml /opt/kibana/config/kibana.yml
-RUN timeout 20m NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana
+RUN timeout 20m sh -c 'NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana'
 # RUN \
 	# ( \
 	# sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch &>/tmp/eslog & \
