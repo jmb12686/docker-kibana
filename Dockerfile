@@ -107,12 +107,17 @@ RUN set -x \
   && cp /nodegit/node_modules/ctags/build/Release/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm ; fi
 
 # Install elastalert plugin
-RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/${ELASTALERT_VERSION}/elastalert-kibana-plugin-${ELASTALERT_VERSION}-${KIBANA_VERSION}.zip
+RUN NODE_OPTIONS="--max_old_space_size=3072" sudo -u kibana /opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/${ELASTALERT_VERSION}/elastalert-kibana-plugin-${ELASTALERT_VERSION}-${KIBANA_VERSION}.zip
 
 
 ## Run kibana to finalize plugin installation and optimization....
 COPY ./config/example/kibana.yml /opt/kibana/config/kibana.yml
-RUN timeout 20m sh -c 'NODE_OPTIONS="--max_old_space_size=6144" sudo -u kibana opt/kibana/bin/kibana'
+#RUN timeout 20m sh -c 'NODE_OPTIONS="--max_old_space_size=3072" sudo -u kibana opt/kibana/bin/kibana'
+RUN \
+	( \
+	set -e; \
+        NODE_OPTIONS="--max_old_space_size=3072" sudo -u kibana opt/kibana/bin/kibana 2>&1 | grep -m 1 "Optimization of .* complete in .* seconds" ; \
+	);
 # RUN \
 	# ( \
 	# sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch &>/tmp/eslog & \

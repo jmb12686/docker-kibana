@@ -92,3 +92,14 @@ Build
 ```bash
 docker buildx build --platform linux/arm,linux/amd64 -t jmb12686/kibana:latest --push .
 ```
+
+##
+
+Multiarchitecture builds are currently not working correctly for added plugins on ARM based platforms.  There appears to be an issue when running the optimization step for kibana after 
+installing a plugin.  This seems to be only when using cross-compilation via QEMU and Docker Buildx.  For cross compiled plugin optimized images, run the following (while substituting your arch):
+
+```bash
+sudo docker build --platform linux/arm/v7 --build-arg TARGETPLATFORM=linux/arm/v7 --tag jmb12686/kibana:7.4.1-elastalert-arm
+```
+
+
