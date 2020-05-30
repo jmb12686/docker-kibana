@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG KIBANA_VERSION=7.5.1
+ARG KIBANA_VERSION=7.7.0
 
 ###############################################################################
 #                                INSTALLATION
