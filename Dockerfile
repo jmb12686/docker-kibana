@@ -42,6 +42,10 @@ RUN set -e \
  && apt install -y --no-install-recommends build-essential
 
  RUN set -e \
+ && apt install -y --no-install-recommends unzip \
+ && apt install -y --no-install-recommends zip
+
+ RUN set -e \
  && apt clean \
  && rm -rf /var/lib/apt/lists/*
 #  && gosu nobody true
