@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG KIBANA_VERSION=7.4.1
+ARG KIBANA_VERSION=7.7.0
 ARG ELASTALERT_VERSION=1.1.0
 ###############################################################################
 #                                INSTALLATION
@@ -82,32 +82,48 @@ RUN set -x \
   && mv node-v10.15.2-linux-armv6l /opt/kibana/node ; fi
 
 
-RUN set -x \
-  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then git clone --branch v0.25.0 --depth 1 https://github.com/nodegit/nodegit.git \
-  && cd /nodegit \
-  && wget https://github.com/fg2it/phantomjs-on-raspberry/releases/download/v2.1.1-wheezy-jessie-armv6/phantomjs \
-  && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \
-  && chmod -R 777 /nodegit \
-  && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
+#RUN set -x \
+#  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then git clone --branch v0.25.0 --depth 1 https://github.com/nodegit/nodegit.git \
+#  && cd /nodegit \
+#  && wget https://github.com/fg2it/phantomjs-on-raspberry/releases/download/v2.1.1-wheezy-jessie-armv6/phantomjs \
+#  && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \
+#  && chmod -R 777 /nodegit ; fi
+  # && /opt/kibana/node/bin/npm install --unsafe-perm ; fi
 
-RUN set -x \
-  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
-  && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
-  && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
-  && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
+# RUN set -x \
+#   && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build/Release.old \
+#   && mv /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist/enums.js.old \
+#   && cp -rf /nodegit/build/Release /opt/kibana/node_modules/@elastic/nodegit/build \
+#   && cp /nodegit/dist/enums.js /opt/kibana/node_modules/@elastic/nodegit/dist ; fi
 
-RUN set -x \
-  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then cd /nodegit \ 
-  && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \  
-  && /opt/kibana/node/bin/npm install ctags --unsafe-perm ; fi
+#RUN set -x \
+#  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then cd /nodegit \ 
+#  && export PATH=$PATH:/nodegit:/opt/kibana/node/bin/ \  
+#  && /opt/kibana/node/bin/npm install ctags --unsafe-perm ; fi
 
-RUN set -x \
-  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-x64 /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm \
-  && mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node.old \
-  && cp /nodegit/node_modules/ctags/build/Release/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm ; fi
+#RUN set -x \
+#  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-x64 /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm \
+#  && mv /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm/ctags.node.old \
+#  && cp /nodegit/node_modules/ctags/build/Release/ctags.node /opt/kibana/node_modules/@elastic/node-ctags/ctags/build/ctags-node-v64-linux-arm ; fi
+
+
+# Make tweaks to support newer version of Kibana
+RUN cd /tmp \
+  && curl -L -O https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/1.1.0/elastalert-kibana-plugin-1.1.0-7.5.0.zip \
+  # [update elasticsearch to 7.6.2; also, fix issue idaholab#119](https://github.com/mmguero-dev/Malcolm/commit/b38ddb7f0d4c5b03e6f8ccad58a656644e113b19)
+  && curl -L -O https://raw.githubusercontent.com/mmguero-dev/Malcolm/development/kibana/elastalert-kibana-plugin/server/routes/elastalert.js \
+  && mv elastalert.js elastalert-server-routes.js \
+  && mv elastalert-kibana-plugin-1.1.0-7.5.0.zip elastalert-kibana-plugin-1.1.0-7.7.0.zip \
+  && unzip elastalert-kibana-plugin-1.1.0-7.7.0.zip kibana/elastalert-kibana-plugin/package.json \
+  && sed -i "s/7\.5\.0/7\.7\.0/g" kibana/elastalert-kibana-plugin/package.json \
+  && mkdir -p kibana/elastalert-kibana-plugin/server/routes/ \
+  && cp /tmp/elastalert-server-routes.js kibana/elastalert-kibana-plugin/server/routes/elastalert.js \
+  && zip elastalert-kibana-plugin-1.1.0-7.7.0.zip kibana/elastalert-kibana-plugin/package.json kibana/elastalert-kibana-plugin/server/routes/elastalert.js \
+  && rm -rf kibana \
+  && rm elastalert-server-routes.js
 
 # Install elastalert plugin
-RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/${ELASTALERT_VERSION}/elastalert-kibana-plugin-${ELASTALERT_VERSION}-${KIBANA_VERSION}.zip
+RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install file:///tmp/elastalert-kibana-plugin-1.1.0-7.7.0.zip
 
 
 ## Run kibana to finalize plugin installation and optimization....
