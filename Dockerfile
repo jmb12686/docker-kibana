@@ -85,6 +85,12 @@ RUN set -x \
   && tar -xvf node-v10.15.2-linux-armv6l.tar.gz \
   && mv node-v10.15.2-linux-armv6l /opt/kibana/node ; fi
 
+  RUN set -x \
+  && if [ "${TARGETPLATFORM}" = "linux/arm64" ] ; then rm -rf /opt/kibana/node \
+  && curl -O https://nodejs.org/dist/v10.15.2/node-v10.15.2-linux-arm64.tar.gz \
+  && tar -xvf node-v10.15.2-linux-arm64.tar.gz \
+  && mv node-v10.15.2-linux-arm64 /opt/kibana/node ; fi
+
 
 #RUN set -x \
 #  && if [ "${TARGETPLATFORM}" = "linux/arm/v7" ] ; then git clone --branch v0.25.0 --depth 1 https://github.com/nodegit/nodegit.git \
