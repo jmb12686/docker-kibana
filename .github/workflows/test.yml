@@ -4,7 +4,11 @@ on:
   pull_request:
     branches: master
   push:
-    branches: master
+    branches: 
+      - 'master'
+      - 'v7.4.1'
+      - 'v7.4.1-elastalert'
+      - 'v7.7.0-elastalert'
 
 jobs:
   test:

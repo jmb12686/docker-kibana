@@ -8,6 +8,7 @@ on:
       - 'master'
       - 'v7.4.1'
       - 'v7.4.1-elastalert'
+      - 'v7.7.0-elastalert'
     tags: '*'
 
 jobs:
