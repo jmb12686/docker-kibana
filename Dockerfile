@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG KIBANA_VERSION=7.7.0
+ARG KIBANA_VERSION=7.7.1
 ARG ELASTALERT_VERSION=1.1.0
 ###############################################################################
 #                                INSTALLATION
@@ -124,17 +124,17 @@ RUN curl -L -O https://github.com/bitsensor/elastalert-kibana-plugin/releases/do
   # [update elasticsearch to 7.6.2; also, fix issue idaholab#119](https://github.com/mmguero-dev/Malcolm/commit/b38ddb7f0d4c5b03e6f8ccad58a656644e113b19)
 RUN curl -L -O https://raw.githubusercontent.com/mmguero-dev/Malcolm/development/kibana/elastalert-kibana-plugin/server/routes/elastalert.js
 RUN mv elastalert.js elastalert-server-routes.js
-RUN mv elastalert-kibana-plugin-1.1.0-7.5.0.zip elastalert-kibana-plugin-1.1.0-7.7.0.zip
-RUN unzip elastalert-kibana-plugin-1.1.0-7.7.0.zip kibana/elastalert-kibana-plugin/package.json
-RUN sed -i "s/7\.5\.0/7\.7\.0/g" kibana/elastalert-kibana-plugin/package.json
+RUN mv elastalert-kibana-plugin-1.1.0-7.5.0.zip elastalert-kibana-plugin-1.1.0-7.7.1.zip
+RUN unzip elastalert-kibana-plugin-1.1.0-7.7.1.zip kibana/elastalert-kibana-plugin/package.json
+RUN sed -i "s/7\.5\.0/7\.7\.1/g" kibana/elastalert-kibana-plugin/package.json
 RUN mkdir -p kibana/elastalert-kibana-plugin/server/routes/
 RUN cp /tmp/elastalert-server-routes.js kibana/elastalert-kibana-plugin/server/routes/elastalert.js
-RUN zip elastalert-kibana-plugin-1.1.0-7.7.0.zip kibana/elastalert-kibana-plugin/package.json kibana/elastalert-kibana-plugin/server/routes/elastalert.js
+RUN zip elastalert-kibana-plugin-1.1.0-7.7.1.zip kibana/elastalert-kibana-plugin/package.json kibana/elastalert-kibana-plugin/server/routes/elastalert.js
 RUN rm -rf kibana
 RUN rm elastalert-server-routes.js
 
 # Install elastalert plugin
-RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install file:///tmp/elastalert-kibana-plugin-1.1.0-7.7.0.zip
+RUN NODE_OPTIONS="--max_old_space_size=4096" sudo -u kibana /opt/kibana/bin/kibana-plugin install file:///tmp/elastalert-kibana-plugin-1.1.0-7.7.1.zip
 
 
 ## Run kibana to finalize plugin installation and optimization....

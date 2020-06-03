@@ -9,6 +9,7 @@ on:
       - 'v7.4.1'
       - 'v7.4.1-elastalert'
       - 'v7.7.0-elastalert'
+      - 'v7.7.1-elastalert'      
 
 jobs:
   test:
